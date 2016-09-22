@@ -2,15 +2,33 @@ import Promise from 'bluebird';
 import Travis  from 'travis-ci';
 import _       from 'lodash';
 import chalk   from 'chalk';
-
+import config  from './config'
 
 /**
  * @param {Mozaik} mozaik
  * @returns {Function}
  */
 const client = mozaik => {
+    mozaik.loadApiConfig(config);
+
     const travis = new Travis({
-        version: '2.0.0'
+        version: '2.0.0',
+        pro: true,
+    });
+
+    
+    const authPromise = new Promise((resolve, reject) => {
+        const token = config.get('github.token');
+        if (token === undefined) {
+            reject(`Missing env variable: GITHUB_TOKEN`);
+        }
+
+        travis.authenticate({
+            github_token: token
+        }, (err) => {
+            if (err) reject(`Authentication failed ${JSON.stringify(err)}`);
+            else resolve(true);
+        });
     });
 
     return {
@@ -34,8 +52,25 @@ const client = mozaik => {
 
                 def.resolve(res.repo);
             });
+            mozaik.logger.info(chalk.yellow(`FOOBAR`));
+
+            mozaik.logger.info(chalk.yellow(`foobar step 1`));
 
             return def.promise;
+        },
+
+        repositoriesForOwner({ owner }) {
+            return new Promise((resolve, reject) => {
+                authPromise
+                    .then(() => {
+                        return travis.repos('zeppelin-no').get((err, res) => {
+                            if (!err) resolve(res);
+                            else reject(err);
+                        })
+                    })
+                    .catch((err) => reject(err));
+            });
+
         },
 
         /**
@@ -66,8 +101,20 @@ const client = mozaik => {
                 def.resolve(res.builds);
             });
 
+            authPromise
+                .then(() => {
+                    mozaik.logger.info(chalk.yellow(`foobar step 2`));
+                    return travis.repos('zeppelin-no').get((err, res) => {
+                        mozaik.logger.info(chalk.yellow(`foobar step 3 ${JSON.stringify(res)}`));
+                    })
+                })
+                .catch((err) => {
+                    mozaik.logger.info(chalk.yellow(`foobar fail 1`));
+                    // reject(err)
+                });
+
             return def.promise;
-        }
+        },
     };
 };
 
