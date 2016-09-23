@@ -1,8 +1,9 @@
-import Promise from 'bluebird';
-import Travis  from 'travis-ci';
-import _       from 'lodash';
-import chalk   from 'chalk';
-import config  from './config';
+import Promise  from 'bluebird';
+import Travis   from 'travis-ci';
+import _        from 'lodash';
+import chalk    from 'chalk';
+import config   from './config';
+import CircleCI from 'circleci';
 
 /**
  * @param {Mozaik} mozaik
@@ -14,6 +15,9 @@ const client = mozaik => {
     const travis = new Travis({
         version: '2.0.0',
         pro: true,
+    });
+    const circleci = new CircleCI({
+        auth: config.get('circleci.token')
     });
 
     // make auth promise
@@ -60,7 +64,7 @@ const client = mozaik => {
         },
 
         // IGNORE, NOT WORKING YET
-        repositoryBuildStatuses({ owner }) {
+        // repositoryBuildStatuses({ owner }) {
             //dirty non-dry 
             // travis.repos(owner).get((err, res) => {
             //     if (err) {
@@ -69,28 +73,39 @@ const client = mozaik => {
 
             //     def.resolve(res.repo);
             // });
-        },
+        // },
 
         // IGNORE, NOT WORKING YET
-        repositoriesForOwner({ owner }) {
-            const def = Promise.defer();
+        // repositoriesForOwner({ owner }) {
+        //     const def = Promise.defer();
 
-            authPromise
-                .then(() => {
-                    mozaik.logger.info(chalk.yellow(`[travis] getting repos for: ${owner}`));
-                    travis.repos('zeppelin-no').get((err, res) => {
-                        if (!err) {
-                            mozaik.logger.info(chalk.yellow(`[travis] got repos ${JSON.stringify(res)}`));
-                            def.resolve(res);
-                        } else {
-                            def.reject(err);
-                        }
-                    });
-                })
-                .catch((err) => {
-                    mozaik.logger.info(chalk.yellow(`[travis] AUTH failed ${JSON.stringify(err)}`));
-                    def.reject(err);
-                });
+        //     authPromise
+        //         .then(() => {
+        //             mozaik.logger.info(chalk.yellow(`[travis] getting repos for: ${owner}`));
+        //             travis.repos('zeppelin-no').get((err, res) => {
+        //                 if (!err) {
+        //                     mozaik.logger.info(chalk.yellow(`[travis] got repos ${JSON.stringify(res)}`));
+        //                     def.resolve(res);
+        //                 } else {
+        //                     def.reject(err);
+        //                 }
+        //             });
+        //         })
+        //         .catch((err) => {
+        //             mozaik.logger.info(chalk.yellow(`[travis] AUTH failed ${JSON.stringify(err)}`));
+        //             def.reject(err);
+        //         });
+
+        //     return def.promise;
+        // },
+        
+        circleciRecent() {
+            const def = Promise.defer();
+            mozaik.logger.info(chalk.yellow(`[travis] calling Circle-CI repo!`));
+
+            circleci.getRecentBuilds({ limit: 5 })
+                .then((builds) => def.resolve(builds))
+                .catch((err) => def.reject(err));
 
             return def.promise;
         },
