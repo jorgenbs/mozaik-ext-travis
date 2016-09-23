@@ -104,8 +104,14 @@ const client = mozaik => {
             mozaik.logger.info(chalk.yellow(`[travis] calling Circle-CI repo!`));
 
             circleci.getRecentBuilds({ limit: 5 })
-                .then((builds) => def.resolve(builds))
-                .catch((err) => def.reject(err));
+                .then((builds) => {
+                    // mozaik.logger.info(chalk.yellow(`[travis] success: ${JSON.stringify(builds)}!`));
+                    def.resolve(builds)
+                })
+                .catch((err) => {
+                    // mozaik.logger.info(chalk.yellow(`[travis] error: ${JSON.stringify(err)}!`));
+                    def.reject(err)
+                });
 
             return def.promise;
         },

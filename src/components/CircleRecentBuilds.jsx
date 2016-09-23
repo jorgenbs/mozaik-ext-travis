@@ -36,7 +36,6 @@ class circlecirecent extends Component {
 
         builds = builds.map((build) => {
             return {
-                id: build.build_num,
                 number: build.build_num,
                 state: circleStateMapper(build.status),
                 finished_at: build.stop_time,
