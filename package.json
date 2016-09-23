@@ -48,7 +48,7 @@
     "cz-conventional-changelog": "1.1.5",
     "enzyme": "2.1.0",
     "eslint": "2.2.0",
-    "eslint-plugin-react": "4.2.2",
+    "eslint-plugin-react": "^4.2.2",
     "mockery": "1.4.1",
     "nyc": "6.1.1",
     "sinon": "1.17.3"

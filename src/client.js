@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 import Travis  from 'travis-ci';
 import _       from 'lodash';
 import chalk   from 'chalk';
-import config  from './config'
+import config  from './config';
 
 /**
  * @param {Mozaik} mozaik
@@ -20,7 +20,7 @@ const client = mozaik => {
     const authPromise = new Promise((resolve, reject) => {
         const token = config.get('github.token');
         if (token === undefined) {
-            reject(`Missing env variable: GITHUB_TOKEN`);
+            reject('Missing env variable: GITHUB_TOKEN');
         }
 
         travis.authenticate({
@@ -59,17 +59,19 @@ const client = mozaik => {
             return def.promise;
         },
 
+        // IGNORE, NOT WORKING YET
         repositoryBuildStatuses({ owner }) {
             //dirty non-dry 
-            travis.repos(owner).get((err, res) => {
-                if (err) {
-                    def.reject(err);
-                }
+            // travis.repos(owner).get((err, res) => {
+            //     if (err) {
+            //         def.reject(err);
+            //     }
 
-                def.resolve(res.repo);
-            });
-        }
+            //     def.resolve(res.repo);
+            // });
+        },
 
+        // IGNORE, NOT WORKING YET
         repositoriesForOwner({ owner }) {
             const def = Promise.defer();
 
@@ -79,16 +81,15 @@ const client = mozaik => {
                     travis.repos('zeppelin-no').get((err, res) => {
                         if (!err) {
                             mozaik.logger.info(chalk.yellow(`[travis] got repos ${JSON.stringify(res)}`));
-                            def.resolve(res)
+                            def.resolve(res);
+                        } else {
+                            def.reject(err);
                         }
-                        else {
-                            def.reject(err)
-                        }
-                    })
+                    });
                 })
                 .catch((err) => {
                     mozaik.logger.info(chalk.yellow(`[travis] AUTH failed ${JSON.stringify(err)}`));
-                    def.reject(err)
+                    def.reject(err);
                 });
 
             return def.promise;
@@ -121,18 +122,6 @@ const client = mozaik => {
 
                 def.resolve(res.builds);
             });
-
-            // authPromise
-            //     .then(() => {
-            //         mozaik.logger.info(chalk.yellow(`foobar step 2`));
-            //         return travis.repos('zeppelin-no').get((err, res) => {
-            //             mozaik.logger.info(chalk.yellow(`foobar step 3 ${JSON.stringify(res)}`));
-            //         })
-            //     })
-            //     .catch((err) => {
-            //         mozaik.logger.info(chalk.yellow(`foobar fail 1`));
-            //         // reject(err)
-            //     });
 
             return def.promise;
         },

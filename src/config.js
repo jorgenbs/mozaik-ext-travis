@@ -9,7 +9,15 @@ const config = convict({
             format:  String,
             env:     'GITHUB_API_TOKEN'
         }
-    }
+    },
+    circleci: {
+        token: {
+            doc:     'CircleCI API Token.',
+            default: '',
+            format:  String,
+            env:     'CIRCLECI_API_TOKEN'
+        }
+    },
 });
 
 
