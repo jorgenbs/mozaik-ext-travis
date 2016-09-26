@@ -64,11 +64,13 @@ const client = mozaik => {
             const def = Promise.defer();
             mozaik.logger.info(chalk.yellow(`[travis] calling Circle-CI repo!`));
 
-            circleci.getRecentBuilds({ limit: 5 })
+            circleci.getRecentBuilds({ limit: 20 })
                 .then((builds) => {
+                    mozaik.logger.info(chalk.yellow(`[travis] Circle-CI success! ${JSON.stringify(builds)} ${JSON.stringify(arguments)}`));
                     def.resolve(builds);
                 })
                 .catch((err) => {
+                    mozaik.logger.info(chalk.yellow(`[travis] Circle-CI fail! ${JSON.stringify(err)} ${JSON.stringify(arguments)}`));
                     def.reject(err);
                 });
 
