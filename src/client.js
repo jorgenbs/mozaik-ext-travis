@@ -56,9 +56,6 @@ const client = mozaik => {
 
                 def.resolve(res.repo);
             });
-            mozaik.logger.info(chalk.yellow(`FOOBAR`));
-
-            mozaik.logger.info(chalk.yellow(`foobar step 1`));
 
             return def.promise;
         },
