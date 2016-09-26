@@ -66,11 +66,9 @@ const client = mozaik => {
 
             circleci.getRecentBuilds({ limit: 5 })
                 .then((builds) => {
-                    mozaik.logger.info(chalk.yellow(`[travis] success: ${JSON.stringify(builds)}!`));
                     def.resolve(builds);
                 })
                 .catch((err) => {
-                    // mozaik.logger.info(chalk.yellow(`[travis] error: ${JSON.stringify(err)}!`));
                     def.reject(err);
                 });
 
@@ -79,8 +77,6 @@ const client = mozaik => {
 
 
         buildHistoryRecent({ owner, repositories }) {
-            mozaik.logger.info(chalk.yellow(`[travis] calling Travis build histories ${repositories.join(',')}`));
-            
             const promises = _.map(repositories, (r) => {
                 return new Promise((resolve, reject) => {
                     travis.repos(owner, r).builds.get((err, res) => {
@@ -91,7 +87,7 @@ const client = mozaik => {
                                 if (commit) {
                                     build.commit = commit;
                                 }
-                                build.repository_name = r;
+                                build.reponame = r;
                             });
 
                             resolve(res.builds);

@@ -42,6 +42,7 @@ class circlecirecent extends Component {
                 commit: {
                     message: build.all_commit_details[0].subject
                 },
+                reponame: build.reponame,
             };
         });
 

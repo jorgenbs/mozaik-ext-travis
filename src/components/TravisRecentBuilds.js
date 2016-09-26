@@ -36,7 +36,7 @@ class TravisRecentBuilds extends Component {
         return (
             <div>
                 <div className="widget__header">
-                    <span className="widget__header__subject">{owner}</span> build history
+                    <span className="widget__header__subject">TravisCI</span> build history
                     <i className="fa fa-bug" />
                 </div>
                 <div className="widget__body">

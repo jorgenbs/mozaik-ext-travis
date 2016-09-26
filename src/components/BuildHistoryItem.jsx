@@ -17,6 +17,7 @@ class BuildHistoryItem extends Component {
 
         return (
             <div className={cssClasses}>
+                <span className="travis__build-history__item__repository">{build.reponame}</span>
                 #{build.number} {commitNode}<br />
                 <time className="list__item__time">
                     <i className="fa fa-clock-o" />&nbsp;
