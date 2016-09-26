@@ -59,42 +59,6 @@ const client = mozaik => {
 
             return def.promise;
         },
-
-        // IGNORE, NOT WORKING YET
-        // repositoryBuildStatuses({ owner }) {
-            //dirty non-dry 
-            // travis.repos(owner).get((err, res) => {
-            //     if (err) {
-            //         def.reject(err);
-            //     }
-
-            //     def.resolve(res.repo);
-            // });
-        // },
-
-        // IGNORE, NOT WORKING YET
-        // repositoriesForOwner({ owner }) {
-        //     const def = Promise.defer();
-
-        //     authPromise
-        //         .then(() => {
-        //             mozaik.logger.info(chalk.yellow(`[travis] getting repos for: ${owner}`));
-        //             travis.repos('zeppelin-no').get((err, res) => {
-        //                 if (!err) {
-        //                     mozaik.logger.info(chalk.yellow(`[travis] got repos ${JSON.stringify(res)}`));
-        //                     def.resolve(res);
-        //                 } else {
-        //                     def.reject(err);
-        //                 }
-        //             });
-        //         })
-        //         .catch((err) => {
-        //             mozaik.logger.info(chalk.yellow(`[travis] AUTH failed ${JSON.stringify(err)}`));
-        //             def.reject(err);
-        //         });
-
-        //     return def.promise;
-        // },
         
         circleciRecent() {
             const def = Promise.defer();
@@ -102,13 +66,53 @@ const client = mozaik => {
 
             circleci.getRecentBuilds({ limit: 5 })
                 .then((builds) => {
-                    // mozaik.logger.info(chalk.yellow(`[travis] success: ${JSON.stringify(builds)}!`));
-                    def.resolve(builds)
+                    mozaik.logger.info(chalk.yellow(`[travis] success: ${JSON.stringify(builds)}!`));
+                    def.resolve(builds);
                 })
                 .catch((err) => {
                     // mozaik.logger.info(chalk.yellow(`[travis] error: ${JSON.stringify(err)}!`));
-                    def.reject(err)
+                    def.reject(err);
                 });
+
+            return def.promise;
+        },
+
+
+        buildHistoryRecent({ owner, repositories }) {
+            mozaik.logger.info(chalk.yellow(`[travis] calling Travis build histories ${repositories.join(',')}`));
+            
+            const promises = _.map(repositories, (r) => {
+                return new Promise((resolve, reject) => {
+                    travis.repos(owner, r).builds.get((err, res) => {
+                        if (res === undefined) reject(err);
+                        else {
+                            res.builds.forEach(build => {
+                                const commit = _.find(res.commits, { id: build.commit_id });
+                                if (commit) {
+                                    build.commit = commit;
+                                }
+                                build.repository_name = r;
+                            });
+
+                            resolve(res.builds);
+                        }
+                    });
+                });
+            });
+
+            let def = Promise.defer();
+
+            authPromise.then(() => {
+                Promise.all(promises).then((repoBuilds) => {
+                    const sortedBuildList = _(repoBuilds)
+                    .flatten()
+                    .sortBy('finished_at')
+                    .reverse()
+                    .value();
+
+                    def.resolve(sortedBuildList);
+                });
+            });
 
             return def.promise;
         },
