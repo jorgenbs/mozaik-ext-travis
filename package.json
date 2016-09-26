@@ -1,10 +1,10 @@
 {
-  "name": "mozaik-ext-travis",
+  "name": "mozaik-ext-travis-circle",
   "version": "1.1.0",
   "description": "Mozaik travis widgets",
   "repository": {
     "type": "git",
-    "url": "git://github.com/plouc/mozaik-ext-travis"
+    "url": "git://github.com/jorgenbs/mozaik-ext-travis-circle"
   },
   "license": "MIT",
   "author": {
@@ -15,7 +15,7 @@
     "node": ">=0.12.0",
     "npm": ">=3.0.0"
   },
-  "homepage": "https://github.com/plouc/mozaik-ext-travis",
+  "homepage": "https://github.com/jorgenbs/mozaik-ext-travis-circle",
   "main": "./src/components/index.js",
   "keywords": [
     "travis",
